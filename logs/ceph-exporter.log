@@ -1,6 +1,0 @@
-2017/06/21 19:09:05 [E] [main.go:99] Oh,shit!!!It's error!!!
-2017/06/21 19:09:05 [D] [main.go:32] src::host=10.21.1.211
-2017/06/21 19:09:05 [D] [main.go:33] src::port=8080
-2017/06/21 19:09:05 [D] [main.go:34] dest::host=192.168.1.113
-2017/06/21 19:09:05 [D] [main.go:35] dest::port=8186
-2017/06/21 19:09:05 [D] [main.go:36] dest::type=telegraf
