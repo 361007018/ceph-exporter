@@ -26,4 +26,4 @@ _testmain.go
 
 
 *.swp
-logs/
+logs/*.log
