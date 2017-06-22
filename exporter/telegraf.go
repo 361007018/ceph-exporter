@@ -8,8 +8,8 @@ type TelegrafExporter struct {
 	Exporter
 }
 
-func (this *TelegrafExporter) Init(srcEndpoint *Endpoint, destEndpoint *Endpoint) {
-	this.Exporter.Init(srcEndpoint, destEndpoint)
+func (this *TelegrafExporter) Init(srcEndpoint *Endpoint, destEndpoint *Endpoint, interval uint) {
+	this.Exporter.Init(srcEndpoint, destEndpoint, interval)
 }
 
 func (this *TelegrafExporter) Run() {

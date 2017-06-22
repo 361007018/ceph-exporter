@@ -6,7 +6,7 @@ import (
 )
 
 type IExporter interface {
-	Init(srcEndpoint *Endpoint, destEndpoint *Endpoint)
+	Init(srcEndpoint *Endpoint, destEndpoint *Endpoint, interval uint)
 	Run()
 }
 
@@ -15,10 +15,11 @@ type Exporter struct {
 	srcEndpoint  *Endpoint
 	destEndpoint *Endpoint
 	threadCtl    *ThreadCtl
+	interval     uint
 }
 
 // Initial exporter
-func (this *Exporter) Init(srcEndpoint *Endpoint, destEndpoint *Endpoint) {
+func (this *Exporter) Init(srcEndpoint *Endpoint, destEndpoint *Endpoint, interval uint) {
 	this.srcEndpoint = &Endpoint{
 		Host: srcEndpoint.Host,
 		Port: srcEndpoint.Port,
@@ -27,6 +28,7 @@ func (this *Exporter) Init(srcEndpoint *Endpoint, destEndpoint *Endpoint) {
 		Host: destEndpoint.Host,
 		Port: destEndpoint.Port,
 	}
+	this.interval = interval
 	this.threadCtl = CreateThreadCtl()
 }
 
