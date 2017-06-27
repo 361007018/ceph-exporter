@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/logs"
 	"os"
+	"time"
 )
 
 var (
@@ -33,7 +34,12 @@ func init() {
 func main() {
 	threadCtl.Run(func() {
 		if exporter != nil {
-			exporter.Run()
+			for {
+				logs.Info("Exporter start running")
+				exporter.Run()
+				logs.Info("Exporter stop running.Restart in 5 s.")
+				time.Sleep(time.Duration(int(time.Second) * 5))
+			}
 		} else {
 			logs.Error("exporter undefined")
 			threadCtl.MarkStopAsync()
@@ -49,8 +55,10 @@ func initExporter() error {
 		return err
 	}
 	logs.Debug("service::interval=" + conf.String("service::interval"))
+	logs.Debug("src::protocol=" + conf.String("src::protocol"))
 	logs.Debug("src::host=" + conf.String("src::host"))
 	logs.Debug("src::port=" + conf.String("src::port"))
+	logs.Debug("dest::protocol=" + conf.String("dest::protocol"))
 	logs.Debug("dest::host=" + conf.String("dest::host"))
 	logs.Debug("dest::port=" + conf.String("dest::port"))
 	logs.Debug("dest::type=" + conf.String("dest::type"))
@@ -61,8 +69,9 @@ func initExporter() error {
 		return err
 	}
 	srcEndpoint := &Endpoint{
-		Host: conf.String("src::host"),
-		Port: int16(srcPort),
+		Protocol: conf.String("src::protocol"),
+		Host:     conf.String("src::host"),
+		Port:     int16(srcPort),
 	}
 
 	// get destination endpoint
@@ -71,8 +80,9 @@ func initExporter() error {
 		return err
 	}
 	destEndpoint := &Endpoint{
-		Host: conf.String("dest::host"),
-		Port: int16(destPort),
+		Protocol: conf.String("dest::protocol"),
+		Host:     conf.String("dest::host"),
+		Port:     int16(destPort),
 	}
 
 	interval, err := conf.Int("service::interval")
@@ -85,8 +95,10 @@ func initExporter() error {
 	switch destType {
 	case "telegraf":
 		{
+			telegrafDb := conf.String("telegraf::db")
+			logs.Debug("telegraf::db=" + telegrafDb)
 			exporter = new(TelegrafExporter)
-			exporter.Init(srcEndpoint, destEndpoint, uint(interval))
+			exporter.Init(srcEndpoint, destEndpoint, uint(interval), telegrafDb)
 		}
 	default:
 		{
