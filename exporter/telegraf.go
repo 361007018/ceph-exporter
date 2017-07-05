@@ -2,7 +2,8 @@ package exporter
 
 import (
 	"bytes"
-	. "ceph-exporter/common"
+	"ceph_exporter/collector"
+	. "ceph_exporter/common"
 	"errors"
 	"github.com/astaxie/beego/logs"
 	"net/http"
@@ -15,24 +16,29 @@ type TelegrafExporter struct {
 	Db string
 }
 
-func (this *TelegrafExporter) Export(data string) {
-	logs.Debug("export to telegraf:" + data)
+func (this *TelegrafExporter) Export(data string) error {
+	logs.Debug("export to telegraf:" + this.destEndpoint.ToString() + "/write?db=" + this.Db + ",data:" + data)
 	dataReader := bytes.NewReader([]byte(data))
-	res, _ := http.Post(this.destEndpoint.ToString()+"/write?db="+this.Db, "plain/text", dataReader)
+	res, err := http.Post(this.destEndpoint.ToString()+"/write?db="+this.Db, "plain/text", dataReader)
+	if err != nil {
+		return err
+	}
 	logs.Debug(res.StatusCode)
+	return nil
 }
 
-func (this *TelegrafExporter) Init(srcEndpoint *Endpoint, destEndpoint *Endpoint, interval uint, args ...interface{}) {
-	this.Exporter.Init(srcEndpoint, destEndpoint, interval)
+func (this *TelegrafExporter) Init(collector collector.ICollector, destEndpoint *Endpoint, interval uint, args ...interface{}) {
+	this.Exporter.Init(collector, destEndpoint, interval)
 	this.Db = args[0].(string)
 }
 
 func (this *TelegrafExporter) Run() {
 	for {
 		var data string
+
 		// get cluster status
 		logs.Info("Get cluster status.")
-		clusterStatus, err := this.Exporter.GetClusterStatus()
+		clusterStatus, err := this.Exporter.Collector.GetClusterStatus()
 		if err != nil {
 			logs.Error(err)
 		}
@@ -57,17 +63,14 @@ func (this *TelegrafExporter) Run() {
 				data += "\nceph,type=pg_state,state_name=" + value.StateName + " value=" + strconv.FormatUint(value.Count, 10)
 			}
 			// get client io rate
-			data += "\nceph,type=pgmap,rw_rate_type=read_bytes_sec value=" + strconv.FormatUint(clusterStatus.Pgmap.ReadBytesSec, 10)
-			data += "\nceph,type=pgmap,rw_rate_type=write_bytes_sec value=" + strconv.FormatUint(clusterStatus.Pgmap.WriteBytesSec, 10)
-			// get client io ops
-			data += "\nceph,type=pgmap,rw_ops_type=read_op_per_sec value=" + strconv.FormatUint(clusterStatus.Pgmap.ReadOpPerSec, 10)
-			data += "\nceph,type=pgmap,rw_ops_type=write_op_per_sec value=" + strconv.FormatUint(clusterStatus.Pgmap.WriteOpPerSec, 10)
+			data += "\nceph,type=cluster,property=io_rate read_bytes_sec=" + strconv.FormatUint(clusterStatus.Pgmap.ReadBytesSec, 10) + ",write_bytes_sec=" + strconv.FormatUint(clusterStatus.Pgmap.WriteBytesSec, 10) + ",read_op_per_sec=" + strconv.FormatUint(clusterStatus.Pgmap.ReadOpPerSec, 10) + ",write_op_per_sec=" + strconv.FormatUint(clusterStatus.Pgmap.WriteOpPerSec, 10)
 			// get mon summary
 			data += "\nceph,type=mon,property=quorum_size up=" + strconv.Itoa(len(clusterStatus.Health.Timechecks.Mons)) + ",all=" + strconv.Itoa(len(clusterStatus.Monmap.Mons)) + `,percent=` + strconv.FormatFloat(float64(len(clusterStatus.Health.Timechecks.Mons))/float64(len(clusterStatus.Monmap.Mons)), 'f', -1, 64)
 		}
+
 		// get osd tree
 		logs.Info("Get osd tree.")
-		osdTree, err := this.Exporter.GetOsdTree()
+		osdTree, err := this.Exporter.Collector.GetOsdTree()
 		if err != nil {
 			logs.Error(err)
 		}
@@ -108,7 +111,24 @@ func (this *TelegrafExporter) Run() {
 			data += "\nceph,type=osd,osd_state=down_and_out value=" + strconv.FormatInt(osd_down_out, 10)
 		}
 
-		this.Export(data)
+		// get pool stats
+		logs.Info("Get pool stats.")
+		poolStats, err := this.Exporter.Collector.GetPoolStats()
+		if err != nil {
+			logs.Error(err)
+		}
+		if poolStats == nil {
+			logs.Error(errors.New("Could not get pool stats."))
+		} else {
+			logs.Debug(poolStats)
+			for _, value := range *poolStats {
+				data += "\nceph,type=pool,property=io_rate,pool_name=" + value.PoolName + " read_bytes_sec=" + strconv.FormatInt(value.ClientIoRate.ReadBytesSec, 10) + ",write_bytes_sec=" + strconv.FormatInt(value.ClientIoRate.WriteBytesSec, 10) + ",read_op_per_sec=" + strconv.FormatInt(value.ClientIoRate.ReadOpPerSec, 10) + ",write_op_per_sec=" + strconv.FormatInt(value.ClientIoRate.WriteOpPerSec, 10)
+			}
+		}
+
+		if err := this.Export(data); err != nil {
+			logs.Error(err)
+		}
 		time.Sleep(time.Duration(int(time.Second) * int(this.interval)))
 	}
 }

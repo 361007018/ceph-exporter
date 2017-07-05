@@ -1,8 +1,9 @@
 package main
 
 import (
-	. "ceph-exporter/common"
-	. "ceph-exporter/exporter"
+	"ceph_exporter/collector"
+	. "ceph_exporter/common"
+	. "ceph_exporter/exporter"
 	"errors"
 	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/logs"
@@ -50,7 +51,7 @@ func main() {
 // initial exporter
 func initExporter() error {
 	// load configuration
-	conf, err := config.NewConfig("ini", "conf/ceph-exporter.ini")
+	conf, err := config.NewConfig("ini", "conf/ceph_exporter.ini")
 	if err != nil {
 		return err
 	}
@@ -90,6 +91,8 @@ func initExporter() error {
 		return err
 	}
 
+	collector := new(collector.CephRestAPICollector)
+	collector.Init(srcEndpoint)
 	// create exporter
 	destType := conf.String("dest::type")
 	switch destType {
@@ -97,8 +100,9 @@ func initExporter() error {
 		{
 			telegrafDb := conf.String("telegraf::db")
 			logs.Debug("telegraf::db=" + telegrafDb)
-			exporter = new(TelegrafExporter)
-			exporter.Init(srcEndpoint, destEndpoint, uint(interval), telegrafDb)
+			var telegrafExporter *TelegrafExporter = new(TelegrafExporter)
+			telegrafExporter.Init(collector, destEndpoint, uint(interval), telegrafDb)
+			exporter = telegrafExporter
 		}
 	default:
 		{
@@ -114,5 +118,5 @@ func initLog() {
 	logs.SetLogFuncCallDepth(3)
 	logs.SetLogger(logs.AdapterConsole)
 	os.MkdirAll("logs/", 0664)
-	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/ceph-exporter.log","maxlines":100000,"daily":true,"maxdays":7,"separate":["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]}`)
+	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/ceph_exporter.log","maxlines":100000,"daily":true,"maxdays":7,"separate":["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]}`)
 }
