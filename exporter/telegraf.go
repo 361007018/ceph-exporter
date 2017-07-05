@@ -126,6 +126,21 @@ func (this *TelegrafExporter) Run() {
 			}
 		}
 
+		// get osd df
+		logs.Info("Get osd df.")
+		osdDf, err := this.Exporter.Collector.GetOsdDf()
+		if err != nil {
+			logs.Error(err)
+		}
+		if poolStats == nil {
+			logs.Error(errors.New("Could not get osd df."))
+		} else {
+			logs.Debug(poolStats)
+			for _, value := range osdDf.Nodes {
+				data += "\nceph,type=osd,osd_name=" + value.Name + " kb=" + strconv.FormatUint(value.Kb, 10) + ",kb_used=" + strconv.FormatUint(value.KbUsed, 10) + ",kb_avail=" + strconv.FormatUint(value.KbAvail, 10) + ",utilization=" + strconv.FormatFloat(value.Utilization, 'f', -1, 64) + ",pgs=" + strconv.FormatUint(value.Pgs, 10)
+			}
+		}
+
 		if err := this.Export(data); err != nil {
 			logs.Error(err)
 		}

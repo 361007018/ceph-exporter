@@ -34,6 +34,24 @@ func (this *CephRestAPICollector) GetClusterStatus() (*common.ResStatus, error) 
 	return result, nil
 }
 
+func (this *CephRestAPICollector) GetOsdDf() (*common.ResOsdDf, error) {
+	httpClient := new(http.Client)
+	resp, err := httpClient.Get(this.srcEndpoint.ToString() + "/v1/osd/df")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	result := new(common.ResOsdDf)
+	if err := json.Unmarshal(bytes, result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (this *CephRestAPICollector) GetOsdTree() (*common.ResOsdTree, error) {
 	httpClient := new(http.Client)
 	resp, err := httpClient.Get(this.srcEndpoint.ToString() + "/v1/osd/tree")
