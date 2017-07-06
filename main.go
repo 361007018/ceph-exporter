@@ -118,5 +118,5 @@ func initLog() {
 	logs.SetLogFuncCallDepth(3)
 	logs.SetLogger(logs.AdapterConsole)
 	os.MkdirAll("logs/", 0664)
-	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/ceph_exporter.log","maxlines":100000,"daily":true,"maxdays":7,"separate":["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]}`)
+	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/ceph_exporter.log","maxlines":100000,"daily":true,"maxdays":7,"separate":["error", "debug"]}`)
 }
