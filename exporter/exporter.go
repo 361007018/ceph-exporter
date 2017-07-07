@@ -1,7 +1,7 @@
 package exporter
 
 import (
-	"ceph-exporter/collector"
+	"ceph-exporter/collecter"
 	. "ceph-exporter/common"
 )
 
@@ -14,12 +14,12 @@ type Exporter struct {
 	srcEndpoint  *Endpoint
 	destEndpoint *Endpoint
 	interval     uint
-	Collector    collector.ICollector
+	Collecter    collecter.ICollecter
 }
 
 // Initial exporter
-func (this *Exporter) Init(collector collector.ICollector, destEndpoint *Endpoint, interval uint) {
-	this.Collector = collector
+func (this *Exporter) Init(collecter collecter.ICollecter, destEndpoint *Endpoint, interval uint) {
+	this.Collecter = collecter
 	this.destEndpoint = destEndpoint
 	this.interval = interval
 }

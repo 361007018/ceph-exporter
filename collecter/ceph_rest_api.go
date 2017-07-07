@@ -1,4 +1,4 @@
-package collector
+package collecter
 
 import (
 	. "ceph-exporter/common"
@@ -8,15 +8,15 @@ import (
 	"net/http"
 )
 
-type CephRestAPICollector struct {
+type CephRestAPICollecter struct {
 	srcEndpoint *Endpoint
 }
 
-func (this *CephRestAPICollector) Init(endpoint *Endpoint) {
+func (this *CephRestAPICollecter) Init(endpoint *Endpoint) {
 	this.srcEndpoint = endpoint
 }
 
-func (this *CephRestAPICollector) GetClusterStatus() (*common.ResStatus, error) {
+func (this *CephRestAPICollecter) GetClusterStatus() (*common.ResStatus, error) {
 	httpClient := new(http.Client)
 	resp, err := httpClient.Get(this.srcEndpoint.ToString() + "/v1/cluster/status")
 	if err != nil {
@@ -34,7 +34,7 @@ func (this *CephRestAPICollector) GetClusterStatus() (*common.ResStatus, error) 
 	return result, nil
 }
 
-func (this *CephRestAPICollector) GetOsdDf() (*common.ResOsdDf, error) {
+func (this *CephRestAPICollecter) GetOsdDf() (*common.ResOsdDf, error) {
 	httpClient := new(http.Client)
 	resp, err := httpClient.Get(this.srcEndpoint.ToString() + "/v1/osd/df")
 	if err != nil {
@@ -52,7 +52,7 @@ func (this *CephRestAPICollector) GetOsdDf() (*common.ResOsdDf, error) {
 	return result, nil
 }
 
-func (this *CephRestAPICollector) GetOsdTree() (*common.ResOsdTree, error) {
+func (this *CephRestAPICollecter) GetOsdTree() (*common.ResOsdTree, error) {
 	httpClient := new(http.Client)
 	resp, err := httpClient.Get(this.srcEndpoint.ToString() + "/v1/osd/tree")
 	if err != nil {
@@ -70,7 +70,7 @@ func (this *CephRestAPICollector) GetOsdTree() (*common.ResOsdTree, error) {
 	return result, nil
 }
 
-func (this *CephRestAPICollector) GetPoolStats() (*common.ResPoolStats, error) {
+func (this *CephRestAPICollecter) GetPoolStats() (*common.ResPoolStats, error) {
 	httpClient := new(http.Client)
 	resp, err := httpClient.Get(this.srcEndpoint.ToString() + "/v1/pool/stats/")
 	if err != nil {

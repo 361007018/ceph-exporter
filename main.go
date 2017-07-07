@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ceph-exporter/collector"
+	"ceph-exporter/collecter"
 	. "ceph-exporter/common"
 	. "ceph-exporter/exporter"
 	"errors"
@@ -91,8 +91,8 @@ func initExporter() error {
 		return err
 	}
 
-	collector := new(collector.CephRestAPICollector)
-	collector.Init(srcEndpoint)
+	collecter := new(collecter.CephRestAPICollecter)
+	collecter.Init(srcEndpoint)
 	// create exporter
 	destType := conf.String("dest::type")
 	switch destType {
@@ -101,7 +101,7 @@ func initExporter() error {
 			telegrafDb := conf.String("telegraf::db")
 			logs.Debug("telegraf::db=" + telegrafDb)
 			var telegrafExporter *TelegrafExporter = new(TelegrafExporter)
-			telegrafExporter.Init(collector, destEndpoint, uint(interval), telegrafDb)
+			telegrafExporter.Init(collecter, destEndpoint, uint(interval), telegrafDb)
 			exporter = telegrafExporter
 		}
 	default:

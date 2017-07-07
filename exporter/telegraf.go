@@ -2,7 +2,7 @@ package exporter
 
 import (
 	"bytes"
-	"ceph-exporter/collector"
+	"ceph-exporter/collecter"
 	. "ceph-exporter/common"
 	"errors"
 	"github.com/astaxie/beego/logs"
@@ -27,8 +27,8 @@ func (this *TelegrafExporter) Export(data string) error {
 	return nil
 }
 
-func (this *TelegrafExporter) Init(collector collector.ICollector, destEndpoint *Endpoint, interval uint, args ...interface{}) {
-	this.Exporter.Init(collector, destEndpoint, interval)
+func (this *TelegrafExporter) Init(collecter collecter.ICollecter, destEndpoint *Endpoint, interval uint, args ...interface{}) {
+	this.Exporter.Init(collecter, destEndpoint, interval)
 	this.Db = args[0].(string)
 }
 
@@ -38,7 +38,7 @@ func (this *TelegrafExporter) Run() {
 
 		// get cluster status
 		logs.Info("Get cluster status.")
-		clusterStatus, err := this.Exporter.Collector.GetClusterStatus()
+		clusterStatus, err := this.Exporter.Collecter.GetClusterStatus()
 		if err != nil {
 			logs.Error(err)
 		}
@@ -70,7 +70,7 @@ func (this *TelegrafExporter) Run() {
 
 		// get osd tree
 		logs.Info("Get osd tree.")
-		osdTree, err := this.Exporter.Collector.GetOsdTree()
+		osdTree, err := this.Exporter.Collecter.GetOsdTree()
 		if err != nil {
 			logs.Error(err)
 		}
@@ -113,7 +113,7 @@ func (this *TelegrafExporter) Run() {
 
 		// get pool stats
 		logs.Info("Get pool stats.")
-		poolStats, err := this.Exporter.Collector.GetPoolStats()
+		poolStats, err := this.Exporter.Collecter.GetPoolStats()
 		if err != nil {
 			logs.Error(err)
 		}
@@ -128,7 +128,7 @@ func (this *TelegrafExporter) Run() {
 
 		// get osd df
 		logs.Info("Get osd df.")
-		osdDf, err := this.Exporter.Collector.GetOsdDf()
+		osdDf, err := this.Exporter.Collecter.GetOsdDf()
 		if err != nil {
 			logs.Error(err)
 		}

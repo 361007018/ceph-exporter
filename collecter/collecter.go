@@ -1,13 +1,13 @@
-package collector
+package collecter
 
 import (
 	"libceph/common"
 )
 
-type Collector struct {
+type Collecter struct {
 }
 
-type ICollector interface {
+type ICollecter interface {
 	GetClusterStatus() (*common.ResStatus, error)
 	GetOsdDf() (*common.ResOsdDf, error)
 	GetOsdTree() (*common.ResOsdTree, error)
