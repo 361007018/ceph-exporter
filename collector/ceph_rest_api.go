@@ -1,7 +1,7 @@
 package collector
 
 import (
-	. "ceph_exporter/common"
+	. "ceph-exporter/common"
 	"encoding/json"
 	"io/ioutil"
 	"libceph/common"

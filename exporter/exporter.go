@@ -1,8 +1,8 @@
 package exporter
 
 import (
-	"ceph_exporter/collector"
-	. "ceph_exporter/common"
+	"ceph-exporter/collector"
+	. "ceph-exporter/common"
 )
 
 type IExporter interface {

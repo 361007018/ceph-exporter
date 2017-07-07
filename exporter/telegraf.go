@@ -2,8 +2,8 @@ package exporter
 
 import (
 	"bytes"
-	"ceph_exporter/collector"
-	. "ceph_exporter/common"
+	"ceph-exporter/collector"
+	. "ceph-exporter/common"
 	"errors"
 	"github.com/astaxie/beego/logs"
 	"net/http"

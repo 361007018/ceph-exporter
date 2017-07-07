@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ceph_exporter/collector"
-	. "ceph_exporter/common"
-	. "ceph_exporter/exporter"
+	"ceph-exporter/collector"
+	. "ceph-exporter/common"
+	. "ceph-exporter/exporter"
 	"errors"
 	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/logs"
@@ -51,7 +51,7 @@ func main() {
 // initial exporter
 func initExporter() error {
 	// load configuration
-	conf, err := config.NewConfig("ini", "conf/ceph_exporter.ini")
+	conf, err := config.NewConfig("ini", "conf/ceph-exporter.ini")
 	if err != nil {
 		return err
 	}
@@ -118,5 +118,5 @@ func initLog() {
 	logs.SetLogFuncCallDepth(3)
 	logs.SetLogger(logs.AdapterConsole)
 	os.MkdirAll("logs/", 0664)
-	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/ceph_exporter.log","maxlines":100000,"daily":true,"maxdays":7,"separate":["error", "debug"]}`)
+	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/ceph-exporter.log","maxlines":100000,"daily":true,"maxdays":7,"separate":["error", "debug"]}`)
 }
