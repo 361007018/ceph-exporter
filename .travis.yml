@@ -1,0 +1,7 @@
+language: golang
+
+go: 
+  - 1.7
+
+script:
+  - go build
